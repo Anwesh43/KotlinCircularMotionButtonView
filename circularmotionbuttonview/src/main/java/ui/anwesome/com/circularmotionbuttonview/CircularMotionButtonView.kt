@@ -29,7 +29,7 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
             canvas.drawCircle(x,y,r,paint)
         }
         private fun contains(button:CircularMotionButton):Boolean = button.i == i
-        fun handleTap(button:CircularMotionButton,x:Float,y:Float):Boolean = contains(button) && x>=this.x-r && x<=this.x+r && y>=this.y-r && y<=this.y+r
+        fun handleTap(button:CircularMotionButton,x:Float,y:Float):Boolean = !contains(button) && x>=this.x-r && x<=this.x+r && y>=this.y-r && y<=this.y+r
     }
     data class CircularMotionButton(var i:Int = 0,var x:Float,var y:Float,var r:Float) {
         val state = CircularMotionButtonState()
@@ -54,6 +54,7 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
                 dir = 0
                 stopcb(scale,1)
                 deg = oDeg+180f
+                button.i = destJ
             }
 
             button.x = px+r*Math.cos(deg*Math.PI/180).toFloat()
@@ -65,6 +66,7 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
             py = holder.y
             deg = 0f
             oDeg = 0f
+            destJ = holder.i
             if(holder.x > button.x) {
                 oDeg = 180f
                 deg = 180f
