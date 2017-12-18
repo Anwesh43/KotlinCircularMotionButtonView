@@ -36,8 +36,27 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
         fun update(stopcb:(Float,Int)->Unit) {
 
         }
-        fun startUpdating(holder:CircularMotionButtonHolder) {
+        fun startUpdating(holder:CircularMotionButtonHolder,startcb:()->Unit) {
 
+        }
+    }
+    data class CircularMotionButtonState(var deg:Float = 0f,var r:Float = 0f,var destJ:Int = 0,var scale:Float = 0f,var dir:Int = 0,var oDeg:Float  =0f) {
+        fun update(stopcb:(Float,Int)->Unit) {
+            scale += 0.1f*dir
+            deg = oDeg + 180f*scale
+            if(scale>1) {
+                scale = 1f
+                dir = 0
+                stopcb(scale,1)
+            }
+        }
+        fun startUpdating(holder:CircularMotionButtonHolder,button:CircularMotionButton,startcb:()->Unit) {
+            var r = Math.abs(button.x-holder.x)
+            if(holder.x > button.x) {
+                deg = 180f
+            }
+            dir = 1
+            startcb()
         }
     }
 }
