@@ -17,4 +17,14 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
         }
         return true
     }
+    data class CircularMotionButtonHolder(var i:Int,var x:Float,var y:Float,var r:Float) {
+        fun draw(canvas:Canvas,paint:Paint) {
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = r/12
+            paint.color = Color.parseColor("#1A237E")
+            canvas.drawCircle(0f,0f,r,paint)
+        }
+        fun contains():Boolean = false
+        fun handleTap(x:Float,y:Float):Boolean = x>=this.x-r && x<=this.x+r && y>=this.y-r && y<=this.y+r
+    }
 }
