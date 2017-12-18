@@ -3,6 +3,7 @@ package ui.anwesome.com.circularmotionbuttonview
 /**
  * Created by anweshmishra on 18/12/17.
  */
+import android.app.Activity
 import android.graphics.*
 import android.view.*
 import android.content.*
@@ -140,6 +141,12 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
         }
         fun handleTap(x:Float,y:Float) {
             animator?.handleTap(x,y)
+        }
+    }
+    companion object {
+        fun create(activity:Activity) {
+            val view = CircularMotionButtonView(activity)
+            activity.setContentView(view)
         }
     }
 }
