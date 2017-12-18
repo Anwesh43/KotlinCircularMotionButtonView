@@ -28,8 +28,8 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
             paint.color = Color.parseColor("#1A237E")
             canvas.drawCircle(x,y,r,paint)
         }
-        fun contains():Boolean = false
-        fun handleTap(x:Float,y:Float):Boolean = x>=this.x-r && x<=this.x+r && y>=this.y-r && y<=this.y+r
+        private fun contains(button:CircularMotionButton):Boolean = button.i == i
+        fun handleTap(button:CircularMotionButton,x:Float,y:Float):Boolean = contains(button) && x>=this.x-r && x<=this.x+r && y>=this.y-r && y<=this.y+r
     }
     data class CircularMotionButton(var i:Int = 0,var x:Float,var y:Float,var r:Float) {
         val state = CircularMotionButtonState()
@@ -45,7 +45,7 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
             state.startUpdating(holder,this,startcb)
         }
     }
-    data class CircularMotionButtonState(var deg:Float = 0f,var r:Float = 0f,var destJ:Int = 0,var scale:Float = 0f,var dir:Int = 0,var oDeg:Float  =0f) {
+    data class CircularMotionButtonState(var deg:Float = 0f,var px:Float = 0f,var py:Float = 0f,var r:Float = 0f,var destJ:Int = 0,var scale:Float = 0f,var dir:Int = 0,var oDeg:Float  =0f) {
         fun update(button:CircularMotionButton,stopcb:(Float,Int)->Unit) {
             scale += 0.1f*dir
             deg = oDeg + 180f*scale
@@ -56,15 +56,21 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
                 deg = oDeg+180f
             }
 
-            button.x = r*Math.cos(deg*Math.PI/180).toFloat()
-            button.y = r*Math.sin(deg*Math.PI/180).toFloat()
+            button.x = px+r*Math.cos(deg*Math.PI/180).toFloat()
+            button.y = py+r*Math.sin(deg*Math.PI/180).toFloat()
         }
         fun startUpdating(holder:CircularMotionButtonHolder,button:CircularMotionButton,startcb:()->Unit) {
-            var r = Math.abs(button.x-holder.x)/2
+            r = Math.abs(button.x-holder.x)/2
+            px = (holder.x+button.x)/2
+            py = holder.y
+            deg = 0f
+            oDeg = 0f
             if(holder.x > button.x) {
+                oDeg = 180f
                 deg = 180f
             }
             dir = 1
+            scale = 0f
             startcb()
         }
     }
@@ -85,13 +91,14 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
             holders.forEach {
                 it.draw(canvas,paint)
             }
+            button.draw(canvas, paint)
         }
         fun update(stopcb:(Float,Int)->Unit){
             button.update(stopcb)
         }
         fun handleTap(x:Float,y:Float,startcb:()->Unit) {
             holders.forEach {
-                if(it.handleTap(x,y)) {
+                if(it.handleTap(button,x,y)) {
                     button.startUpdating(it,startcb)
                     return
                 }
