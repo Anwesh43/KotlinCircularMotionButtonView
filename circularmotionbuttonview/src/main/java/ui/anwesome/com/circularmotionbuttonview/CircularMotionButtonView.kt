@@ -96,4 +96,33 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
             }
         }
     }
+    data class CircularMotionButtonAnimator(var container:CircularMotionButtonContainer,var view:CircularMotionButtonView) {
+        var animated = false
+        fun draw(canvas:Canvas,paint:Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            container.draw(canvas,paint)
+        }
+        fun update() {
+            if(animated) {
+                container.update({scale,j ->
+                    animated = false
+                })
+                try {
+                    Thread.sleep(50)
+                    view.invalidate()
+                }
+                catch(ex:Exception) {
+
+                }
+            }
+        }
+        fun handleTap(x:Float,y:Float) {
+            if(!animated) {
+                container.handleTap(x,y,{
+                    animated = true
+                    view.postInvalidate()
+                })
+            }
+        }
+    }
 }
