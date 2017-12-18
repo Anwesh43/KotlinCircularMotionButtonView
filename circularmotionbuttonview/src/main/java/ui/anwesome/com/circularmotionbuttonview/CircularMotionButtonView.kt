@@ -6,6 +6,8 @@ package ui.anwesome.com.circularmotionbuttonview
 import android.graphics.*
 import android.view.*
 import android.content.*
+import java.util.concurrent.ConcurrentLinkedQueue
+
 class CircularMotionButtonView(ctx:Context):View(ctx) {
     val paint:Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     override fun onDraw(canvas:Canvas) {
@@ -62,6 +64,36 @@ class CircularMotionButtonView(ctx:Context):View(ctx) {
             }
             dir = 1
             startcb()
+        }
+    }
+    data class CircularMotionButtonContainer(var w:Float,var h:Float,var n:Int = 3) {
+        var holders:ConcurrentLinkedQueue<CircularMotionButtonHolder> = ConcurrentLinkedQueue()
+        var button:CircularMotionButton = CircularMotionButton(x=w/2,y=h/2,r=Math.min(w,h)/3)
+        init {
+            var gap = w/(2*n+1)
+            var x = 3*gap/2
+            button.x = x
+            button.r = gap/2
+            for(i in 0..n-1) {
+                holders.add(CircularMotionButtonHolder(i,x,h/2,gap/2))
+                x+=2*gap
+            }
+        }
+        fun draw(canvas:Canvas,paint:Paint) {
+            holders.forEach {
+                it.draw(canvas,paint)
+            }
+        }
+        fun update(stopcb:(Float,Int)->Unit){
+            button.update(stopcb)
+        }
+        fun handleTap(x:Float,y:Float,startcb:()->Unit) {
+            holders.forEach {
+                if(it.handleTap(x,y)) {
+                    button.startUpdating(it,startcb)
+                    return
+                }
+            }
         }
     }
 }
